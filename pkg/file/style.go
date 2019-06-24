@@ -1,0 +1,36 @@
+// Copyright 2019 Liam White
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package file
+
+type languageStyle struct {
+	// Does this language have specific requirements on the content of the first few lines of the file.
+	// For example, `#! /bin/sh` for shell scripts
+	prefix []string
+
+	// Will this language use block comments for the license?
+	// If false this will use single line comment style
+	isBlock bool
+
+	// The comment string to be used.
+	// If isBlock is true this should be the block comment style
+	// If false this should be the single line comment style
+	comment string
+}
+
+var commentStyles = map[string]*languageStyle{
+	"golang": &languageStyle{prefix: nil, isBlock: false, comment: "//"},
+	"python": &languageStyle{prefix: nil, isBlock: false, comment: "#"},
+	"shell":  &languageStyle{prefix: []string{"#! /bin/sh"}, isBlock: false, comment: "#"},
+}
