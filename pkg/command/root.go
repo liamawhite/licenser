@@ -15,50 +15,19 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/liamawhite/licenser/pkg/license"
-
-	"github.com/liamawhite/licenser/pkg/processor"
 	"github.com/spf13/cobra"
 )
 
 var (
 	recurseDirectories bool
-	isDryRun           bool
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "licenser <directory> <copyright-owner>",
-	Short: "licenser",
-
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) <= 1 {
-			return errors.New("not enough arguments passed")
-		}
-		f, err := os.Open(args[0])
-		if err != nil {
-			return err
-		}
-		fInfo, err := f.Stat()
-		if err != nil {
-			return err
-		}
-		if !fInfo.IsDir() {
-			return fmt.Errorf("%q is not a directory", args[0])
-		}
-		return nil
-	},
-	Run: func(cmd *cobra.Command, args []string) {
-		license := license.NewApache20(time.Now().Year(), args[1])
-		l := processor.New(args[0], recurseDirectories, license)
-		if err := l.Run(isDryRun); err != nil {
-			fmt.Println(err)
-		}
-	},
+	Use:   "licenser",
+	Short: "Applies and detects the absence of licenses in your repository",
 }
 
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -70,6 +39,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolVarP(&recurseDirectories, "recurse", "r", false, "recurse from the passed directory")
-	rootCmd.Flags().BoolVarP(&isDryRun, "dry-run", "d", false, "output result to stdout")
+	rootCmd.PersistentFlags().BoolVarP(&recurseDirectories, "recurse", "r", false, "recurse from the passed directory")
 }

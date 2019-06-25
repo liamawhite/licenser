@@ -15,6 +15,7 @@
 package processor
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,39 +28,54 @@ import (
 
 type processor struct {
 	startDirectory string
-	recurse        bool
-	wg             sync.WaitGroup
-	mutator        *file.Mutator
 	dryRun         bool
+
+	wg      sync.WaitGroup
+	mutator *file.Mutator
+	success bool
+
+	visitFunc func(path string, dryRun bool) bool
 }
 
-func New(startDirectory string, recurse bool, license license.Handler) *processor {
+func New(startDirectory string, license license.Handler) *processor {
 	return &processor{
 		startDirectory: startDirectory,
-		recurse:        recurse,
 		mutator:        mutator.New(license),
 	}
 }
 
-func (p *processor) Run(dryRun bool) error {
+func (p *processor) Apply(recurse, dryRun bool) bool {
 	p.dryRun = dryRun
-	if p.recurse {
+	p.visitFunc = p.mutator.AppendLicense
+	return p.run(recurse)
+}
+
+func (p *processor) Verify(recurse bool) bool {
+	p.visitFunc = p.mutator.VerifyLicense
+	return p.run(recurse)
+}
+
+func (p *processor) run(recurse bool) bool {
+	p.success = true
+	if recurse {
 		filepath.Walk(p.startDirectory, p.visit)
 	} else {
 		f, err := os.Open(p.startDirectory)
 		if err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "error opening info for directory %v:%v", p.startDirectory, err)
+			return false
 		}
 		fileList, err := f.Readdir(0)
 		if err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "error reading contents of directory %v:%v", p.startDirectory, err)
+			return false
 		}
 		for _, file := range fileList {
 			p.visit(filepath.Join(p.startDirectory, file.Name()), file, nil)
 		}
 	}
 	p.wg.Wait()
-	return nil
+	return p.success
 }
 
 func (p *processor) visit(path string, f os.FileInfo, err error) error {
@@ -69,7 +85,9 @@ func (p *processor) visit(path string, f os.FileInfo, err error) error {
 	if !f.IsDir() {
 		p.wg.Add(1)
 		go func(path string) {
-			p.mutator.AppendLicense(path, p.dryRun)
+			if !p.visitFunc(path, p.dryRun) {
+				p.success = false
+			}
 			p.wg.Done()
 		}(path)
 	}

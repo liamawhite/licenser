@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,21 +33,15 @@ type Mutator struct {
 	license license.Handler
 }
 
-func (m *Mutator) AppendLicense(path string, dryRun bool) {
-	style := identifyLanguageStyle(path)
-	if style == nil {
-		return
+func (m *Mutator) AppendLicense(path string, dryRun bool) bool {
+	// If we can't detect language skip (return true)
+	styled := m.styledLicense(path)
+	if styled == nil {
+		return true
 	}
-	styled := styledLicense(m.license.Reader(), style)
-	f, err := os.Open(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to open %v", path)
-	}
-
-	// This will be an issue with really large files...
-	contents, err := ioutil.ReadAll(f)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to read file %v", path)
+	contents := getFileContents(path)
+	if contents == nil {
+		return false
 	}
 	if !m.license.IsPresent(bytes.NewReader(contents)) {
 		newContents := append(styled, contents...)
@@ -60,17 +53,38 @@ func (m *Mutator) AppendLicense(path string, dryRun bool) {
 			}
 		}
 	}
+	return true
+}
+
+func (m *Mutator) VerifyLicense(path string, _ bool) bool {
+	contents := getFileContents(path)
+	if contents == nil {
+		return false
+	}
+	// If we can't detect language skip (return true)
+	if style := identifyLanguageStyle(path); style == nil {
+		return true
+	}
+	present := m.license.IsPresent(bytes.NewReader(contents))
+	if !present {
+		fmt.Fprintf(os.Stderr, "license missing from %v\n", path)
+	}
+	return present
 }
 
 // this should probably be cached on a per language basis
-func styledLicense(license io.Reader, style *languageStyle) []byte {
+func (m *Mutator) styledLicense(path string) []byte {
+	style := identifyLanguageStyle(path)
+	if style == nil {
+		return nil
+	}
 	buf := bytes.NewBuffer([]byte{})
 
 	// TODO: implement block styling
 	if style.isBlock {
 
 	} else {
-		scanner := bufio.NewScanner(license)
+		scanner := bufio.NewScanner(m.license.Reader())
 		for scanner.Scan() {
 			buf.WriteString(style.comment)
 			if len(scanner.Bytes()) != 0 {
@@ -97,4 +111,18 @@ func identifyLanguageStyle(path string) *languageStyle {
 		fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
 		return nil
 	}
+}
+
+func getFileContents(path string) []byte {
+	f, err := os.Open(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "unable to open %v", path)
+	}
+
+	// This will be an issue with really large files...
+	contents, err := ioutil.ReadAll(f)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "unable to read file %v", path)
+	}
+	return contents
 }
