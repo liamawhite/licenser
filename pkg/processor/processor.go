@@ -98,5 +98,8 @@ func shouldSkip(path string) bool {
 	if strings.Contains(path, ".git") {
 		return true
 	}
+	if strings.Contains(path, ".md") {
+		return true
+	}
 	return false
 }

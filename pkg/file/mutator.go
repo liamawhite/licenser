@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/liamawhite/licenser/pkg/license"
 )
@@ -99,18 +100,35 @@ func (m *Mutator) styledLicense(path string) []byte {
 }
 
 // This function has the potential to become an unwiedly mess, consider rethinking.
+// TODO: Create a language interface that can be cycled through]
+// in order to identify the file as said language
 func identifyLanguageStyle(path string) *languageStyle {
 	switch filepath.Ext(path) {
+	case ".cc", ".cpp", "c++", "c":
+		return commentStyles["c"]
 	case ".go":
 		return commentStyles["golang"]
 	case ".py":
 		return commentStyles["python"]
-	case ".sh":
+	case ".sh", ".patch":
 		return commentStyles["shell"]
-	default:
-		fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
-		return nil
+	case ".yaml", ".yml":
+		return commentStyles["yaml"]
 	}
+	if match, _ := regexp.MatchString("\\..*rc", path); match {
+		return commentStyles["shell"]
+	}
+	if match, _ := regexp.MatchString(".*Makefile.*", path); match {
+		return commentStyles["make"]
+	}
+	if match, _ := regexp.MatchString(".*Dockerfile.*", path); match {
+		return commentStyles["docker"]
+	}
+	if match, _ := regexp.MatchString(".*BUILD|WORKSPACE.*", path); match {
+		return commentStyles["bazel"]
+	}
+	fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
+	return nil
 }
 
 func getFileContents(path string) []byte {
