@@ -1,4 +1,3 @@
-// 
 // Copyright 2019 Liam White
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/liamawhite/licenser/pkg/license"
 )
@@ -46,7 +46,7 @@ func (m *Mutator) AppendLicense(path string, dryRun bool) bool {
 		return false
 	}
 	if !m.license.IsPresent(bytes.NewReader(contents)) {
-		newContents := append(styled, contents...)
+		newContents := merge(styled, contents)
 		if dryRun {
 			fmt.Printf("%s\n", newContents)
 		} else {
@@ -87,8 +87,6 @@ func (m *Mutator) styledLicense(path string) []byte {
 
 	} else {
 		scanner := bufio.NewScanner(m.license.Reader())
-		buf.WriteString(style.comment)
-		buf.WriteString(" \n")
 		for scanner.Scan() {
 			buf.WriteString(style.comment)
 			if len(scanner.Bytes()) != 0 {
@@ -97,9 +95,31 @@ func (m *Mutator) styledLicense(path string) []byte {
 			buf.Write(scanner.Bytes())
 			buf.WriteString("\n")
 		}
-		buf.WriteString("\n")
 	}
 	return buf.Bytes()
+}
+
+// this is also pretty horrible but does the job
+func merge(license, file []byte) []byte {
+	result := bytes.NewBuffer([]byte{})
+	fileScanner := bufio.NewScanner(bytes.NewReader(file))
+	licensePlaced := false
+	for fileScanner.Scan() {
+		// If we've placed the license just continue to dump out the rest of the file
+		if licensePlaced {
+			result.Write(fileScanner.Bytes())
+			result.WriteString("\n")
+			continue
+		}
+		// If there's a #! preserve it
+		if strings.Contains(fileScanner.Text(), "#!") {
+			result.Write(fileScanner.Bytes())
+			result.WriteString("\n\n")
+		}
+		result.Write(license)
+		licensePlaced = true
+	}
+	return result.Bytes()
 }
 
 // This function has the potential to become an unwiedly mess, consider rethinking.
