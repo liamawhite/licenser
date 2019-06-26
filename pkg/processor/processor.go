@@ -82,7 +82,7 @@ func (p *processor) visit(path string, f os.FileInfo, err error) error {
 	if shouldSkip(path) {
 		return nil
 	}
-	if !f.IsDir() {
+	if f.Mode().IsRegular() {
 		p.wg.Add(1)
 		go func(path string) {
 			if !p.visitFunc(path, p.dryRun) {

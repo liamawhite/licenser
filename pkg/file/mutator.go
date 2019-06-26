@@ -157,13 +157,13 @@ func identifyLanguageStyle(path string) *languageStyle {
 func getFileContents(path string) []byte {
 	f, err := os.Open(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to open %v", path)
+		fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
 	}
 
 	// This will be an issue with really large files...
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to read file %v", path)
+		fmt.Fprintf(os.Stderr, "unable to read file %v\n", path)
 	}
 	return contents
 }
