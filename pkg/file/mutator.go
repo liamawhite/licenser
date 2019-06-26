@@ -103,21 +103,24 @@ func (m *Mutator) styledLicense(path string) []byte {
 func merge(license, file []byte) []byte {
 	result := bytes.NewBuffer([]byte{})
 	fileScanner := bufio.NewScanner(bytes.NewReader(file))
-	licensePlaced := false
 	for fileScanner.Scan() {
-		// If we've placed the license just continue to dump out the rest of the file
-		if licensePlaced {
-			result.Write(fileScanner.Bytes())
-			result.WriteString("\n")
-			continue
-		}
 		// If there's a #! preserve it
 		if strings.Contains(fileScanner.Text(), "#!") {
 			result.Write(fileScanner.Bytes())
 			result.WriteString("\n\n")
+			result.Write(license)
+		} else {
+			result.Write(license)
+			result.WriteString("\n")
+			result.Write(fileScanner.Bytes())
+			result.WriteString("\n")
 		}
-		result.Write(license)
-		licensePlaced = true
+
+		// Now that we've written the license just dump the rest
+		for fileScanner.Scan() {
+			result.Write(fileScanner.Bytes())
+			result.WriteString("\n")
+		}
 	}
 	return result.Bytes()
 }
