@@ -10,7 +10,14 @@ Licenses:
 
 Languages:
 
+- Bazel
+- C/C++
+- Dockerfile
 - Golang
+- Make
+- Python
+- Shell
+- YAML
 
 ## Install
 
