@@ -1,3 +1,4 @@
+// 
 // Copyright 2019 Liam White
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,6 +87,8 @@ func (m *Mutator) styledLicense(path string) []byte {
 
 	} else {
 		scanner := bufio.NewScanner(m.license.Reader())
+		buf.WriteString(style.comment)
+		buf.WriteString(" \n")
 		for scanner.Scan() {
 			buf.WriteString(style.comment)
 			if len(scanner.Bytes()) != 0 {
