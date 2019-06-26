@@ -21,7 +21,7 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - '*docs*'
-    - '*test*'
+    - '.*docs.*'
+    - '.*test.*'
     - 'Merge pull request*'
-    - '*goreleaser*'
+    - '.*goreleaser.*'
