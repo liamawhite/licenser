@@ -52,6 +52,7 @@ var verifyCmd = &cobra.Command{
 		if ok := l.Verify(recurseDirectories); !ok {
 			os.Exit(1)
 		}
+		fmt.Println("verification successful!")
 	},
 }
 
