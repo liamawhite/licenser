@@ -14,9 +14,13 @@ Languages:
 
 ## Install
 
+To install on macOS, use Homebrew.
+
 ```sh
 brew install liamawhite/licenser/licenser
 ```
+
+To install on other platforms, download from the [releases section](https://github.com/liamawhite/licenser/releases).
 
 ## Verifying Licenses in your Files
 
