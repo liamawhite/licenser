@@ -6,6 +6,13 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - 386
+    - amd64
 archives:
 - replacements:
     darwin: Darwin
@@ -21,7 +28,17 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - '.*docs.*'
-    - '.*test.*'
-    - 'Merge pull request*'
-    - '.*goreleaser.*'
+    - docs
+    - test
+    - Merge pull request
+    - Merge branch
+    - goreleaser
+brew:
+  github:
+    owner: liamawhite
+    name: homebrew-licenser
+  folder: Formula
+  homepage:  https://github.com/liamawhite/licenser
+  description: Verify and append licenses to your GitHub repositories
+  test: |
+    system "#{bin}/licenser -v"
