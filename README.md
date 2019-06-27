@@ -16,6 +16,7 @@ Languages:
 - Golang
 - Make
 - Python
+- Protobuf
 - Shell
 - YAML
 
@@ -30,7 +31,7 @@ brew install liamawhite/licenser/licenser
 To install on Ubuntu/Debian, use `wget`.
 
 ```sh
-wget -c https://github.com/liamawhite/licenser/releases/download/v0.3.3/licenser_0.3.3_Linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/bin
+wget -c https://github.com/liamawhite/licenser/releases/download/v${VERSION}/licenser_${VERSION}_Linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/bin
 ```
 
 To install on other platforms, download from the [releases section](https://github.com/liamawhite/licenser/releases).

@@ -136,6 +136,8 @@ func identifyLanguageStyle(path string) *languageStyle {
 		return commentStyles["golang"]
 	case ".py":
 		return commentStyles["python"]
+	case ".proto":
+		return commentStyles["protobuf"]
 	case ".sh", ".patch":
 		return commentStyles["shell"]
 	case ".yaml", ".yml":
