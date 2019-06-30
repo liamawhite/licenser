@@ -32,8 +32,7 @@ type Apache20 struct {
 	Year  int
 	Owner string
 
-	licenseCache   []byte
-	detectionCache []byte
+	licenseCache []byte
 }
 
 func (a *Apache20) Reader() io.Reader {
