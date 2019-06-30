@@ -1,4 +1,4 @@
-.vscode
-bin
-vendor
-dist
+.vscode/
+bin/
+vendor/
+dist/

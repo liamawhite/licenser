@@ -28,6 +28,13 @@ import (
 var verifyCmd = &cobra.Command{
 	Use:   "verify <directory>",
 	Short: "Verify licenses are present in files in your directory",
+	Long: `Verify licenses are present in files in your directory.
+	
+Verify will ignore the following files:
+  - Anything matched by the top level .gitignore
+  - .gitignore
+  - *.md, *.golden
+`,
 
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {

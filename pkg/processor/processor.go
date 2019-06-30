@@ -15,12 +15,13 @@
 package processor
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
+	"github.com/gobwas/glob"
 	"github.com/liamawhite/licenser/pkg/file"
 	mutator "github.com/liamawhite/licenser/pkg/file"
 	"github.com/liamawhite/licenser/pkg/license"
@@ -34,13 +35,18 @@ type processor struct {
 	mutator *file.Mutator
 	success bool
 
+	skipListGlob      []glob.Glob
+	skipListExtension map[string]bool
+
 	visitFunc func(path string, dryRun bool) bool
 }
 
 func New(startDirectory string, license license.Handler) *processor {
 	return &processor{
-		startDirectory: startDirectory,
-		mutator:        mutator.New(license),
+		startDirectory:    startDirectory,
+		mutator:           mutator.New(license),
+		skipListGlob:      buildGlobSkip(startDirectory),
+		skipListExtension: buildExtensionSkip(),
 	}
 }
 
@@ -79,7 +85,7 @@ func (p *processor) run(recurse bool) bool {
 }
 
 func (p *processor) visit(path string, f os.FileInfo, err error) error {
-	if shouldSkip(path) {
+	if p.shouldSkip(path) {
 		return nil
 	}
 	if f.Mode().IsRegular() {
@@ -94,12 +100,37 @@ func (p *processor) visit(path string, f os.FileInfo, err error) error {
 	return nil
 }
 
-func shouldSkip(path string) bool {
-	if strings.Contains(path, ".git") {
-		return true
+func (p *processor) shouldSkip(path string) bool {
+	for _, g := range p.skipListGlob {
+		if g.Match(path) {
+			return true
+		}
 	}
-	if strings.Contains(path, ".md") {
-		return true
+	return p.skipListExtension[filepath.Ext(path)]
+}
+
+func buildGlobSkip(startDirectory string) []glob.Glob {
+	globList := []string{".git/**", ".gitignore"}
+	// TODO: handle multilevel gitignores
+	gitignore := filepath.Join(startDirectory, ".gitignore")
+	f, err := os.Open(gitignore)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error opening .gitignore:%v", err)
 	}
-	return false
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		globList = append(globList, fmt.Sprintf("%v**", scanner.Text()))
+	}
+	result := []glob.Glob{}
+	for _, pattern := range globList {
+		toGlob := filepath.Join(startDirectory, pattern)
+		result = append(result, glob.MustCompile(toGlob))
+	}
+	return result
+}
+func buildExtensionSkip() map[string]bool {
+	return map[string]bool{
+		".md":     true,
+		".golden": true,
+	}
 }
