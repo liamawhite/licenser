@@ -15,13 +15,13 @@
 package processor
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
-	"github.com/gobwas/glob"
+	"github.com/denormal/go-gitignore"
 	"github.com/liamawhite/licenser/pkg/file"
 	mutator "github.com/liamawhite/licenser/pkg/file"
 	"github.com/liamawhite/licenser/pkg/license"
@@ -35,7 +35,7 @@ type processor struct {
 	mutator *file.Mutator
 	success bool
 
-	skipListGlob      []glob.Glob
+	skipListGitIgnore gitignore.GitIgnore
 	skipListExtension map[string]bool
 
 	visitFunc func(path string, dryRun bool) bool
@@ -45,7 +45,7 @@ func New(startDirectory string, license license.Handler) *processor {
 	return &processor{
 		startDirectory:    startDirectory,
 		mutator:           mutator.New(license),
-		skipListGlob:      buildGlobSkip(startDirectory),
+		skipListGitIgnore: buildGitIgnoreSkip(startDirectory),
 		skipListExtension: buildExtensionSkip(),
 	}
 }
@@ -68,12 +68,12 @@ func (p *processor) run(recurse bool) bool {
 	} else {
 		f, err := os.Open(p.startDirectory)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error opening info for directory %v:%v", p.startDirectory, err)
+			fmt.Fprintf(os.Stderr, "error opening info for directory %v:%v\n", p.startDirectory, err)
 			return false
 		}
 		fileList, err := f.Readdir(0)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error reading contents of directory %v:%v", p.startDirectory, err)
+			fmt.Fprintf(os.Stderr, "error reading contents of directory %v:%v\n", p.startDirectory, err)
 			return false
 		}
 		for _, file := range fileList {
@@ -101,32 +101,25 @@ func (p *processor) visit(path string, f os.FileInfo, err error) error {
 }
 
 func (p *processor) shouldSkip(path string) bool {
-	for _, g := range p.skipListGlob {
-		if g.Match(path) {
-			return true
-		}
+	if _, ok := p.skipListExtension[filepath.Ext(path)]; ok {
+		return true
 	}
-	return p.skipListExtension[filepath.Ext(path)]
+	if strings.Contains(path, ".git") {
+		return true
+	}
+	f, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return p.skipListGitIgnore.Relative(path, f.IsDir()) != nil
 }
 
-func buildGlobSkip(startDirectory string) []glob.Glob {
-	globList := []string{".git/**", ".gitignore"}
-	// TODO: handle multilevel gitignores
-	gitignore := filepath.Join(startDirectory, ".gitignore")
-	f, err := os.Open(gitignore)
+func buildGitIgnoreSkip(startDirectory string) gitignore.GitIgnore {
+	gitignore, err := gitignore.NewRepository(startDirectory)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error opening .gitignore:%v", err)
+		fmt.Fprintf(os.Stderr, "error reading contents of .gitignore:%v\n", err)
 	}
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		globList = append(globList, fmt.Sprintf("%v**", scanner.Text()))
-	}
-	result := []glob.Glob{}
-	for _, pattern := range globList {
-		toGlob := filepath.Join(startDirectory, pattern)
-		result = append(result, glob.MustCompile(toGlob))
-	}
-	return result
+	return gitignore
 }
 func buildExtensionSkip() map[string]bool {
 	return map[string]bool{
