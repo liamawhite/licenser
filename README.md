@@ -20,6 +20,12 @@ Languages:
 - Shell
 - YAML
 
+Licenser will also automatically ignore the following files:
+
+- *.md, *.golden
+- .gitignore
+- Anything matched by the top level .gitignore (experimental)
+
 ## Install
 
 To install on macOS, use Homebrew.
