@@ -126,18 +126,18 @@ func merge(license, file []byte) []byte {
 }
 
 // This function has the potential to become an unwiedly mess, consider rethinking.
-// TODO: Create a language interface that can be cycled through]
-// in order to identify the file as said language
+// TODO: Create a language interface that can be cycled through in order to identify the file as said language
+// Interface should have a lightweight "looksLike" and then a more heavyweight "verify"
 func identifyLanguageStyle(path string) *languageStyle {
 	switch filepath.Ext(path) {
-	case ".cc", ".cpp", "c++", "c":
+	case ".cc", ".cpp", ".c++", ".c":
 		return commentStyles["c"]
 	case ".go":
 		return commentStyles["golang"]
-	case ".py":
-		return commentStyles["python"]
 	case ".proto":
 		return commentStyles["protobuf"]
+	case ".py":
+		return commentStyles["python"]
 	case ".sh", ".patch":
 		return commentStyles["shell"]
 	case ".yaml", ".yml":
@@ -146,13 +146,13 @@ func identifyLanguageStyle(path string) *languageStyle {
 	if match, _ := regexp.MatchString("\\..*rc", path); match {
 		return commentStyles["shell"]
 	}
-	if match, _ := regexp.MatchString(".*Makefile.*", path); match {
+	if match, _ := regexp.MatchString(".*Makefile$", path); match {
 		return commentStyles["make"]
 	}
-	if match, _ := regexp.MatchString(".*Dockerfile.*", path); match {
+	if match, _ := regexp.MatchString(".*Dockerfile(\\..*)?$", path); match {
 		return commentStyles["docker"]
 	}
-	if match, _ := regexp.MatchString(".*BUILD|WORKSPACE.*", path); match {
+	if match, _ := regexp.MatchString(".*BUILD(\\..*)?$|WORKSPACE(\\..*)?$", path); match {
 		return commentStyles["bazel"]
 	}
 	fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
@@ -165,7 +165,7 @@ func getFileContents(path string) []byte {
 		fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
 	}
 
-	// This will be an issue with really large files...
+	// Reading an entire file into memory will be an issue with really large files...
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to read file %v\n", path)

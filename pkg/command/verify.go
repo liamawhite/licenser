@@ -15,7 +15,6 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -26,7 +25,7 @@ import (
 )
 
 var verifyCmd = &cobra.Command{
-	Use:   "verify <directory>",
+	Use:   "verify",
 	Short: "Verify licenses are present in files in your directory",
 	Long: `Verify licenses are present in files in your directory.
 	
@@ -35,27 +34,9 @@ Verify will ignore the following files:
   - .gitignore
   - Anything matched by the top level .gitignore (experimental)
 `,
-
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
-			return errors.New("not enough arguments passed")
-		}
-		f, err := os.Open(args[0])
-		if err != nil {
-			return err
-		}
-		fInfo, err := f.Stat()
-		if err != nil {
-			return err
-		}
-		if !fInfo.IsDir() {
-			return fmt.Errorf("%q is not a directory", args[0])
-		}
-		return nil
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		license := license.NewApache20(time.Now().Year(), "")
-		l := processor.New(args[0], license)
+		l := processor.New(".", license)
 		if ok := l.Verify(recurseDirectories); !ok {
 			os.Exit(1)
 		}

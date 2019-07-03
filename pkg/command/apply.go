@@ -16,7 +16,6 @@ package command
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -30,29 +29,18 @@ var (
 )
 
 var applyCmd = &cobra.Command{
-	Use:   "apply <directory> <copyright-owner>",
+	Use:   "apply <copyright-owner>",
 	Short: "Apply licenses to files in your directory",
 
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) <= 1 {
 			return errors.New("not enough arguments passed")
 		}
-		f, err := os.Open(args[0])
-		if err != nil {
-			return err
-		}
-		fInfo, err := f.Stat()
-		if err != nil {
-			return err
-		}
-		if !fInfo.IsDir() {
-			return fmt.Errorf("%q is not a directory", args[0])
-		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		license := license.NewApache20(time.Now().Year(), args[1])
-		l := processor.New(args[0], license)
+		l := processor.New(".", license)
 		if ok := l.Apply(recurseDirectories, isDryRun); !ok {
 			os.Exit(1)
 		}
