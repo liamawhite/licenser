@@ -44,16 +44,16 @@ To install on other platforms, download from the [releases section](https://gith
 
 ## Verifying Licenses in your Files
 
-To verify that licenses are present in all files in a repository, run the `verify` command, with the `--recurse` flag, passing in the directory to start from.
+To verify that licenses are present in all files in a repository, run the `verify` command at the root, with the `--recurse` flag.
 
 ```sh
-licenser verify -r .
+licenser verify -r
 ```
 
 ## Apply Licenses to your Files
 
-To prepend licenses to all files in a repository, run the `apply` command, with the `--recurse` flag, passing in the directory to start from and the copyright owner.
+To prepend licenses to all files in a repository, run the `apply` command at the root, with the `--recurse` flag, passing in the copyright owner.
 
 ```sh
-licenser apply -r . "Copyright Owner"
+licenser apply -r "Copyright Owner"
 ```
