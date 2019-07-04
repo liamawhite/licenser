@@ -33,13 +33,13 @@ var applyCmd = &cobra.Command{
 	Short: "Apply licenses to files in your directory",
 
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) <= 1 {
+		if len(args) < 1 {
 			return errors.New("not enough arguments passed")
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		license := license.NewApache20(time.Now().Year(), args[1])
+		license := license.NewApache20(time.Now().Year(), args[0])
 		l := processor.New(".", license)
 		if ok := l.Apply(recurseDirectories, isDryRun); !ok {
 			os.Exit(1)
