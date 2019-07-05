@@ -1,0 +1,16 @@
+SUCCESS=true
+
+# Ensure Licenses are present
+if licenser verify -r; then
+    echo "Licenses are present on all recognised files."
+else
+    echo "Licenses are missing."
+    SUCCESS=false
+fi
+
+if [ "$SUCCESS" = false ] ; then
+    echo "Lint failed."
+    exit 1
+else
+    echo "Lint passed!"
+fi

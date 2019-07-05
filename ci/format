@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Apply Licenses
+licenser apply -r "Tetrate"
