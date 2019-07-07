@@ -24,10 +24,12 @@ import (
 
 var _ Handler = &Apache20{}
 
+// NewApache20 creates a new Apache 2.0 license handler
 func NewApache20(year int, owner string) *Apache20 {
 	return &Apache20{Year: year, Owner: owner}
 }
 
+// Apache20 is an Apache 2.0 license handler
 type Apache20 struct {
 	Year  int
 	Owner string
@@ -35,10 +37,12 @@ type Apache20 struct {
 	licenseCache []byte
 }
 
+// Reader returns a reader populated with the Apache 2.0 license file prefix
 func (a *Apache20) Reader() io.Reader {
 	return bytes.NewReader(a.bytes())
 }
 
+// IsPresent verifies that an Apache 2.0 license is present in the reader passed.
 func (a *Apache20) IsPresent(in io.Reader) bool {
 	inScanner := bufio.NewScanner(in)
 	// Check for presence of license in first 20 lines
@@ -59,7 +63,7 @@ func (a *Apache20) bytes() []byte {
 	}
 	tmpl, _ := template.New("apache20").Parse(apache20Template)
 	b := bytes.NewBuffer([]byte{})
-	tmpl.Execute(b, a)
+	_ = tmpl.Execute(b, a)
 	a.licenseCache = b.Bytes()
 	return copyBytes(a.licenseCache)
 }

@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 	Short: "Applies and detects the absence of licenses in your repository",
 }
 
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// Execute is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

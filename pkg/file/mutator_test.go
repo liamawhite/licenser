@@ -83,9 +83,10 @@ func Test_identifyLanguageStyle(t *testing.T) {
 		{"test.yml/test", noLanguage},
 	}
 	for _, tt := range tests {
-		name := fmt.Sprintf("%s is %s", tt.path, tt.want)
+		tc := tt
+		name := fmt.Sprintf("%s is %s", tc.path, tc.want)
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, commentStyles[tt.want], identifyLanguageStyle(tt.path))
+			assert.Equal(t, commentStyles[tc.want], identifyLanguageStyle(tc.path))
 		})
 	}
 }

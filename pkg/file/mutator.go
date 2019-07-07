@@ -27,15 +27,20 @@ import (
 	"github.com/liamawhite/licenser/pkg/license"
 )
 
+// New returns a new file Mutator
 func New(license license.Handler) *Mutator {
 	return &Mutator{license: license}
 }
 
+var _ Licenser = &Mutator{}
+
+// Mutator mutates files
 type Mutator struct {
 	license license.Handler
 }
 
-func (m *Mutator) AppendLicense(path string, dryRun bool) bool {
+// Apply the license to the path passed or print to stdout if dryRun
+func (m *Mutator) Apply(path string, dryRun bool) bool {
 	// If we can't detect language skip (return true)
 	styled := m.styledLicense(path)
 	if styled == nil {
@@ -49,16 +54,15 @@ func (m *Mutator) AppendLicense(path string, dryRun bool) bool {
 		newContents := merge(styled, contents)
 		if dryRun {
 			fmt.Printf("%s\n", newContents)
-		} else {
-			if err := ioutil.WriteFile(path, newContents, 0644); err != nil {
-				fmt.Fprintf(os.Stderr, "error writing license to %v:%v", path, err)
-			}
+		} else if err := ioutil.WriteFile(path, newContents, 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "error writing license to %v:%v", path, err)
 		}
 	}
 	return true
 }
 
-func (m *Mutator) VerifyLicense(path string, _ bool) bool {
+// Verify returns true if the license is present in the file passed
+func (m *Mutator) Verify(path string, _ bool) bool {
 	contents := getFileContents(path)
 	if contents == nil {
 		return false
@@ -88,12 +92,12 @@ func (m *Mutator) styledLicense(path string) []byte {
 	} else {
 		scanner := bufio.NewScanner(m.license.Reader())
 		for scanner.Scan() {
-			buf.WriteString(style.comment)
+			_, _ = buf.WriteString(style.comment)
 			if len(scanner.Bytes()) != 0 {
-				buf.WriteString(" ")
+				_, _ = buf.WriteString(" ")
 			}
-			buf.Write(scanner.Bytes())
-			buf.WriteString("\n")
+			_, _ = buf.Write(scanner.Bytes())
+			_, _ = buf.WriteString("\n")
 		}
 	}
 	return buf.Bytes()
@@ -129,19 +133,9 @@ func merge(license, file []byte) []byte {
 // TODO: Create a language interface that can be cycled through in order to identify the file as said language
 // Interface should have a lightweight "looksLike" and then a more heavyweight "verify"
 func identifyLanguageStyle(path string) *languageStyle {
-	switch filepath.Ext(path) {
-	case ".cc", ".cpp", ".c++", ".c":
-		return commentStyles["c"]
-	case ".go":
-		return commentStyles["golang"]
-	case ".proto":
-		return commentStyles["protobuf"]
-	case ".py":
-		return commentStyles["python"]
-	case ".sh", ".patch":
-		return commentStyles["shell"]
-	case ".yaml", ".yml":
-		return commentStyles["yaml"]
+	// This comparison is probably cheaper so do it first.
+	if result := identifyFromExtension(filepath.Ext(path)); result != nil {
+		return result
 	}
 	if match, _ := regexp.MatchString("\\..*rc", path); match {
 		return commentStyles["shell"]
@@ -159,7 +153,27 @@ func identifyLanguageStyle(path string) *languageStyle {
 	return nil
 }
 
+func identifyFromExtension(extension string) *languageStyle {
+	switch extension {
+	case ".cc", ".cpp", ".c++", ".c":
+		return commentStyles["c"]
+	case ".go":
+		return commentStyles["golang"]
+	case ".proto":
+		return commentStyles["protobuf"]
+	case ".py":
+		return commentStyles["python"]
+	case ".sh", ".patch":
+		return commentStyles["shell"]
+	case ".yaml", ".yml":
+		return commentStyles["yaml"]
+	default:
+		return nil
+	}
+}
+
 func getFileContents(path string) []byte {
+	// #nosec - required by the interface by design
 	f, err := os.Open(path)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
