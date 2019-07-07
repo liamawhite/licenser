@@ -33,26 +33,27 @@ func TestApache20_Reader(t *testing.T) {
 
 func TestApache20_IsPresent(t *testing.T) {
 	tests := []struct {
-		name   string
+		name      string
 		inputFile string
-		want   bool
+		want      bool
 	}{
 		{
-			name: "License is present",
+			name:      "License is present",
 			inputFile: "testdata/apache.golden",
-			want: true,
+			want:      true,
 		},
 		{
-			name: "License is not present",
+			name:      "License is not present",
 			inputFile: "testdata/nolicense.golden",
-			want: false,
+			want:      false,
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		tc := tt
+		t.Run(tc.name, func(t *testing.T) {
 			a := &Apache20{}
-			inputReader, _ := os.Open(tt.inputFile)
-			assert.Equal(t, tt.want, a.IsPresent(inputReader))
+			inputReader, _ := os.Open(tc.inputFile)
+			assert.Equal(t, tc.want, a.IsPresent(inputReader))
 		})
 	}
 }

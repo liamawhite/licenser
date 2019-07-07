@@ -1,16 +1,25 @@
+#!/bin/bash
+
 SUCCESS=true
 
 # Ensure Licenses are present
-if licenser verify -r; then
+if licenser verify -r .; then
     echo "Licenses are present on all recognised files."
 else
     echo "Licenses are missing."
     SUCCESS=false
 fi
 
+if golangci-lint run; then
+    echo "golangci-lint succeded."
+else
+    echo "golangci-lint failed."
+    SUCCESS=false
+fi
+
 if [ "$SUCCESS" = false ] ; then
-    echo "Lint failed."
+    echo "One or more linters failed."
     exit 1
 else
-    echo "Lint passed!"
+    echo "All linters passed!"
 fi

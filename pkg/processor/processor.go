@@ -27,22 +27,25 @@ import (
 	"github.com/liamawhite/licenser/pkg/license"
 )
 
-type processor struct {
+// Processor finds all valid files and passes them to a file mutator to be handled
+type Processor struct {
 	startDirectory string
-	dryRun         bool
 
-	wg      sync.WaitGroup
-	mutator *file.Mutator
+	mutator   file.Licenser
+	visitFunc func(path string, dryRun bool) bool
+	wg        sync.WaitGroup
+
+	dryRun  bool
 	success bool
 
 	skipListGitIgnore gitignore.GitIgnore
 	skipListExtension map[string]bool
-
-	visitFunc func(path string, dryRun bool) bool
 }
 
-func New(startDirectory string, license license.Handler) *processor {
-	return &processor{
+// New creates a new file processor starting the the passed startDirectory
+// and using the passed license to apply and verify files
+func New(startDirectory string, license license.Handler) *Processor {
+	return &Processor{
 		startDirectory:    startDirectory,
 		mutator:           mutator.New(license),
 		skipListGitIgnore: buildGitIgnoreSkip(startDirectory),
@@ -50,21 +53,25 @@ func New(startDirectory string, license license.Handler) *processor {
 	}
 }
 
-func (p *processor) Apply(recurse, dryRun bool) bool {
+// Apply tells the mutator to prepend the license to all walked files
+func (p *Processor) Apply(recurse, dryRun bool) bool {
 	p.dryRun = dryRun
-	p.visitFunc = p.mutator.AppendLicense
+	p.visitFunc = p.mutator.Apply
 	return p.run(recurse)
 }
 
-func (p *processor) Verify(recurse bool) bool {
-	p.visitFunc = p.mutator.VerifyLicense
+// Verify tells the mutator to check that all walked files have a license
+func (p *Processor) Verify(recurse bool) bool {
+	p.visitFunc = p.mutator.Verify
 	return p.run(recurse)
 }
 
-func (p *processor) run(recurse bool) bool {
+func (p *Processor) run(recurse bool) bool {
 	p.success = true
 	if recurse {
-		filepath.Walk(p.startDirectory, p.visit)
+		if err := filepath.Walk(p.startDirectory, p.visit); err != nil {
+			fmt.Fprintf(os.Stderr, "error walking filepath: %v", err)
+		}
 	} else {
 		f, err := os.Open(p.startDirectory)
 		if err != nil {
@@ -77,14 +84,17 @@ func (p *processor) run(recurse bool) bool {
 			return false
 		}
 		for _, file := range fileList {
-			p.visit(filepath.Join(p.startDirectory, file.Name()), file, nil)
+			filePath := filepath.Join(p.startDirectory, file.Name())
+			if err := p.visit(filePath, file, nil); err != nil {
+				fmt.Fprintf(os.Stderr, "error visiting %q: %v", filePath, err)
+			}
 		}
 	}
 	p.wg.Wait()
 	return p.success
 }
 
-func (p *processor) visit(path string, f os.FileInfo, err error) error {
+func (p *Processor) visit(path string, f os.FileInfo, err error) error {
 	if p.shouldSkip(path) {
 		return nil
 	}
@@ -100,7 +110,7 @@ func (p *processor) visit(path string, f os.FileInfo, err error) error {
 	return nil
 }
 
-func (p *processor) shouldSkip(path string) bool {
+func (p *Processor) shouldSkip(path string) bool {
 	if _, ok := p.skipListExtension[filepath.Ext(path)]; ok {
 		return true
 	}

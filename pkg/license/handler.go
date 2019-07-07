@@ -16,7 +16,11 @@ package license
 
 import "io"
 
+// Handler is the interface required to implement a license
 type Handler interface {
+	// Reader returns an io.Reader of the license bytes that will be prepended to files
 	Reader() io.Reader
+
+	// IsPresent returns true if it can find the license in the passed reader
 	IsPresent(in io.Reader) bool
 }
