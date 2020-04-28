@@ -1,0 +1,2 @@
+/licenserignore/*.yaml
+!/licenserignore/include.yaml

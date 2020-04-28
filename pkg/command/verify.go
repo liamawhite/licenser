@@ -32,7 +32,9 @@ var verifyCmd = &cobra.Command{
 Verify will ignore the following files:
   - *.md, *.golden
   - .gitignore
-  - Anything matched by the top level .gitignore (experimental)
+  - Files that should be ignored according to .gitignore (experimental)
+  - .licenserignore
+  - Files that should be ignored according to .licenserignore (experimental)
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		license := license.NewApache20(time.Now().Year(), "")
