@@ -1,9 +1,12 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
+LICENSER="go run ${BASEDIR}/../main.go"
+
 SUCCESS=true
 
 # Ensure Licenses are present
-if licenser verify -r .; then
+if ${LICENSER} verify -r .; then
     echo "Licenses are present on all recognised files."
 else
     echo "Licenses are missing."
