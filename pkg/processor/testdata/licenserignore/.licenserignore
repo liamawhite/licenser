@@ -1,0 +1,2 @@
+/nested/*.yaml
+!/nested/include.yaml

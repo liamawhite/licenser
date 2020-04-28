@@ -24,7 +24,9 @@ Licenser will also automatically ignore the following files:
 
 - *.md, *.golden
 - .gitignore
-- Anything matched by the top level .gitignore (experimental)
+- Files that should be ignored according to .gitignore (experimental)
+- .licenserignore
+- Files that should be ignored according to .licenserignore (experimental)
 
 ## Install
 

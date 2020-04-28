@@ -27,6 +27,9 @@ import (
 	"github.com/liamawhite/licenser/pkg/license"
 )
 
+// licenserignoreFile is a name for *ignore files specific to licenser.
+const licenserignoreFile = ".licenserignore"
+
 // Processor finds all valid files and passes them to a file mutator to be handled
 type Processor struct {
 	startDirectory string
@@ -38,18 +41,20 @@ type Processor struct {
 	dryRun  bool
 	success bool
 
-	skipListGitIgnore gitignore.GitIgnore
-	skipListExtension map[string]bool
+	skipListGitIgnore      gitignore.GitIgnore
+	skipListLicenserIgnore gitignore.GitIgnore
+	skipListExtension      map[string]bool
 }
 
 // New creates a new file processor starting the the passed startDirectory
 // and using the passed license to apply and verify files
 func New(startDirectory string, license license.Handler) *Processor {
 	return &Processor{
-		startDirectory:    startDirectory,
-		mutator:           mutator.New(license),
-		skipListGitIgnore: buildGitIgnoreSkip(startDirectory),
-		skipListExtension: buildExtensionSkip(),
+		startDirectory:         startDirectory,
+		mutator:                mutator.New(license),
+		skipListGitIgnore:      buildGitIgnoreSkip(startDirectory),
+		skipListLicenserIgnore: buildLicenserIgnoreSkip(startDirectory),
+		skipListExtension:      buildExtensionSkip(),
 	}
 }
 
@@ -111,17 +116,32 @@ func (p *Processor) visit(path string, f os.FileInfo, err error) error {
 }
 
 func (p *Processor) shouldSkip(path string) bool {
+	// skip predefined file types
 	if _, ok := p.skipListExtension[filepath.Ext(path)]; ok {
 		return true
 	}
+	// skip .git/**, .gitignore, .gitattributes, etc
 	if strings.Contains(path, ".git") {
 		return true
 	}
-	f, err := os.Stat(path)
-	if err != nil {
+	// don't skip start dir (it cannot be ignored by *ignore files anyway,
+	// and `go-gitignore` library crashes on this use case)
+	if path == p.startDirectory {
 		return false
 	}
-	return p.skipListGitIgnore.Relative(path, f.IsDir()) != nil
+	// skip according to .gitignore
+	if match := p.skipListGitIgnore.Match(path); match != nil && match.Ignore() {
+		return true
+	}
+	// skip .licenserignore
+	if filepath.Base(path) == licenserignoreFile {
+		return true
+	}
+	// skip according to .licenserignore
+	if match := p.skipListLicenserIgnore.Match(path); match != nil && match.Ignore() {
+		return true
+	}
+	return false
 }
 
 func buildGitIgnoreSkip(startDirectory string) gitignore.GitIgnore {
@@ -131,6 +151,15 @@ func buildGitIgnoreSkip(startDirectory string) gitignore.GitIgnore {
 	}
 	return gitignore
 }
+
+func buildLicenserIgnoreSkip(startDirectory string) gitignore.GitIgnore {
+	ignore, err := gitignore.NewRepositoryWithFile(startDirectory, licenserignoreFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading contents of %s:%v\n", licenserignoreFile, err)
+	}
+	return ignore
+}
+
 func buildExtensionSkip() map[string]bool {
 	return map[string]bool{
 		".md":     true,
