@@ -163,6 +163,8 @@ func identifyFromExtension(extension string) *languageStyle {
 		return commentStyles["protobuf"]
 	case ".py":
 		return commentStyles["python"]
+	case ".rs":
+		return commentStyles["rust"]
 	case ".sh", ".patch":
 		return commentStyles["shell"]
 	case ".yaml", ".yml":

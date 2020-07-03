@@ -68,6 +68,10 @@ func Test_identifyLanguageStyle(t *testing.T) {
 		{"test/test.py", "python"},
 		{"test.py/test", noLanguage},
 
+		{"test.rs", "rust"},
+		{"test/test.rs", "rust"},
+		{"test.rs/test", noLanguage},
+
 		{"test.sh", "shell"},
 		{"test/test.sh", "shell"},
 		{"test.sh/test", noLanguage},
