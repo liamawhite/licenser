@@ -35,6 +35,7 @@ var commentStyles = map[string]*languageStyle{
 	"make":     {isBlock: false, comment: "#"},
 	"protobuf": {isBlock: false, comment: "//"},
 	"python":   {isBlock: false, comment: "#"},
+	"rust":     {isBlock: false, comment: "//"},
 	"shell":    {isBlock: false, comment: "#"},
 	"yaml":     {isBlock: false, comment: "#"},
 }
