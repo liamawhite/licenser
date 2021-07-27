@@ -22,16 +22,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestApache20_Reader(t *testing.T) {
-	t.Run("Reader has correct bytes", func(t *testing.T) {
-		a := NewApache20(2019, "Test")
+func TestReader(t *testing.T) {
+	t.Run("Reader has correct bytes form string", func(t *testing.T) {
+		a := FromTemplateString(license, mark, 2019, "Test")
+		want, _ := ioutil.ReadFile("testdata/apache.golden")
+		got, _ := ioutil.ReadAll(a.Reader())
+		assert.Equal(t, want, got)
+	})
+
+	t.Run("Reader has correct bytes from file ", func(t *testing.T) {
+		a := FromTemplateFile("testdata/apache.golden", mark, 2019, "Test")
 		want, _ := ioutil.ReadFile("testdata/apache.golden")
 		got, _ := ioutil.ReadAll(a.Reader())
 		assert.Equal(t, want, got)
 	})
 }
 
-func TestApache20_IsPresent(t *testing.T) {
+func TestIsPresent(t *testing.T) {
 	tests := []struct {
 		name      string
 		inputFile string
@@ -51,7 +58,7 @@ func TestApache20_IsPresent(t *testing.T) {
 	for _, tt := range tests {
 		tc := tt
 		t.Run(tc.name, func(t *testing.T) {
-			a := NewApache20(0, "") // The presence check doesn't care about these values
+			a := FromTemplateFile("testdata/apache.golden", mark, 0, "") // The presence check doesn't care about these values
 			inputReader, _ := os.Open(tc.inputFile)
 			assert.Equal(t, tc.want, a.IsPresent(inputReader))
 		})

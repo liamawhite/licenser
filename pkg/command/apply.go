@@ -16,7 +16,6 @@ package command
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/liamawhite/licenser/pkg/license"
@@ -25,29 +24,51 @@ import (
 )
 
 var (
-	isDryRun bool
+	isDryRun     bool
+	templatePath string
+	markerString string
 )
 
 var applyCmd = &cobra.Command{
-	Use:   "apply <copyright-owner>",
+	Use:   "apply [-t <template file> -m <license-mark>] <copyright-owner>",
 	Short: "Apply licenses to files in your directory",
-
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("not enough arguments passed")
 		}
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		license := license.NewApache20(time.Now().Year(), args[0])
-		l := processor.New(".", license)
-		if ok := l.Apply(recurseDirectories, isDryRun); !ok {
-			os.Exit(1)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		handler, err := newHandler(templatePath, markerString, args[0])
+		if err != nil {
+			return err
 		}
+
+		l := processor.New(".", handler)
+		if ok := l.Apply(recurseDirectories, isDryRun); !ok {
+			return errors.New("error applying license")
+		}
+
+		return nil
 	},
 }
 
 func init() {
 	applyCmd.Flags().BoolVarP(&isDryRun, "dry-run", "d", false, "output result to stdout")
+	applyCmd.Flags().StringVarP(&templatePath, "license-template", "t", "", "license template file to use. By default Apache 2.0 license template is used")
+	applyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "substring to check for to validate the presence of the license header")
 	rootCmd.AddCommand(applyCmd)
+}
+
+func newHandler(template, marker, owner string) (license.Handler, error) {
+	var h license.Handler
+	if template == "" {
+		h = license.NewApache20(time.Now().Year(), owner)
+	} else {
+		if marker == "" {
+			return nil, errors.New("--license-mark is required when using --license-template")
+		}
+		h = license.FromTemplateFile(template, marker, time.Now().Year(), owner)
+	}
+	return h, nil
 }
