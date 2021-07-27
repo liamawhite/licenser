@@ -51,7 +51,7 @@ func TestApache20_IsPresent(t *testing.T) {
 	for _, tt := range tests {
 		tc := tt
 		t.Run(tc.name, func(t *testing.T) {
-			a := &Apache20{}
+			a := NewApache20(0, "") // The presence check doesn't care about these values
 			inputReader, _ := os.Open(tc.inputFile)
 			assert.Equal(t, tc.want, a.IsPresent(inputReader))
 		})

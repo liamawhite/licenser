@@ -54,8 +54,8 @@ func (m *Mutator) Apply(path string, dryRun bool) bool {
 		newContents := merge(styled, contents)
 		if dryRun {
 			fmt.Printf("%s\n", newContents)
-		} else if err := ioutil.WriteFile(path, newContents, 0644); err != nil {
-			fmt.Fprintf(os.Stderr, "error writing license to %v:%v", path, err)
+		} else if err := ioutil.WriteFile(path, newContents, 0644); err != nil { // nolint: gosec
+			_, _ = fmt.Fprintf(os.Stderr, "error writing license to %v:%v", path, err)
 		}
 	}
 	return true
@@ -73,7 +73,7 @@ func (m *Mutator) Verify(path string, _ bool) bool {
 	}
 	present := m.license.IsPresent(bytes.NewReader(contents))
 	if !present {
-		fmt.Fprintf(os.Stderr, "license missing from %v\n", path)
+		_, _ = fmt.Fprintf(os.Stderr, "license missing from %v\n", path)
 	}
 	return present
 }
@@ -149,7 +149,7 @@ func identifyLanguageStyle(path string) *languageStyle {
 	if match, _ := regexp.MatchString(".*BUILD(\\..*)?$|WORKSPACE(\\..*)?$", path); match {
 		return commentStyles["bazel"]
 	}
-	fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
+	_, _ = fmt.Fprintf(os.Stderr, "unable to identify language of %v\n", path)
 	return nil
 }
 
@@ -178,13 +178,13 @@ func getFileContents(path string) []byte {
 	// #nosec - required by the interface by design
 	f, err := os.Open(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
+		_, _ = fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
 	}
 
 	// Reading an entire file into memory will be an issue with really large files...
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to read file %v\n", path)
+		_, _ = fmt.Fprintf(os.Stderr, "unable to read file %v\n", path)
 	}
 	return contents
 }

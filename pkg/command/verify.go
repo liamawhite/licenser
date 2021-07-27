@@ -17,15 +17,13 @@ package command
 import (
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/liamawhite/licenser/pkg/license"
 	"github.com/liamawhite/licenser/pkg/processor"
 	"github.com/spf13/cobra"
 )
 
 var verifyCmd = &cobra.Command{
-	Use:   "verify",
+	Use:   "verify [-t <template file> -m <license-mark>]",
 	Short: "Verify licenses are present in files in your directory",
 	Long: `Verify licenses are present in files in your directory.
 	
@@ -36,16 +34,24 @@ Verify will ignore the following files:
   - .licenserignore
   - Files that should be ignored according to .licenserignore (experimental)
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		license := license.NewApache20(time.Now().Year(), "")
-		l := processor.New(".", license)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		handler, err := newHandler(templatePath, markerString, "")
+		if err != nil {
+			return err
+		}
+
+		l := processor.New(".", handler)
 		if ok := l.Verify(recurseDirectories); !ok {
 			os.Exit(1)
 		}
 		fmt.Println("verification successful!")
+
+		return nil
 	},
 }
 
 func init() {
+	verifyCmd.Flags().StringVarP(&templatePath, "license-template", "t", "", "license template file to use. By default Apache 2.0 license template is used")
+	verifyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "mark to check against the file when checking if the license header is present")
 	rootCmd.AddCommand(verifyCmd)
 }
