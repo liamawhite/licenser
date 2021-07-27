@@ -52,6 +52,6 @@ Verify will ignore the following files:
 
 func init() {
 	verifyCmd.Flags().StringVarP(&templatePath, "license-template", "t", "", "license template file to use. By default Apache 2.0 license template is used")
-	verifyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "mark to check against the file when checking if the license header is present")
+	verifyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "substring to check for to validate the presence of the license header")
 	rootCmd.AddCommand(verifyCmd)
 }

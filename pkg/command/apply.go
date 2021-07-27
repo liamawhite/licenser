@@ -56,7 +56,7 @@ var applyCmd = &cobra.Command{
 func init() {
 	applyCmd.Flags().BoolVarP(&isDryRun, "dry-run", "d", false, "output result to stdout")
 	applyCmd.Flags().StringVarP(&templatePath, "license-template", "t", "", "license template file to use. By default Apache 2.0 license template is used")
-	applyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "mark to check against the file when checking if the license header is present")
+	applyCmd.Flags().StringVarP(&markerString, "license-mark", "m", "", "substring to check for to validate the presence of the license header")
 	rootCmd.AddCommand(applyCmd)
 }
 
