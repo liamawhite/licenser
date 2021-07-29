@@ -41,3 +41,21 @@ var commentStyles = map[string]*languageStyle{
 	"sql":       {isBlock: false, comment: "--"},
 	"yaml":      {isBlock: false, comment: "#"},
 }
+
+var commonExtensions = map[string]string{
+	".c":     "c",
+	".cpp":   "c",
+	".c++":   "c",
+	".cc":    "c",
+	".go":    "golang",
+	".mk":    "make",
+	".proto": "protobuf",
+	".py":    "python",
+	".rs":    "rust",
+	".sh":    "shell",
+	".patch": "shell",
+	".sql":   "sql",
+	".tf":    "terraform",
+	".yaml":  "yaml",
+	".yml":   "yaml",
+}
