@@ -154,24 +154,11 @@ func identifyLanguageStyle(path string) *languageStyle {
 }
 
 func identifyFromExtension(extension string) *languageStyle {
-	switch extension {
-	case ".cc", ".cpp", ".c++", ".c":
-		return commentStyles["c"]
-	case ".go":
-		return commentStyles["golang"]
-	case ".proto":
-		return commentStyles["protobuf"]
-	case ".py":
-		return commentStyles["python"]
-	case ".rs":
-		return commentStyles["rust"]
-	case ".sh", ".patch":
-		return commentStyles["shell"]
-	case ".yaml", ".yml":
-		return commentStyles["yaml"]
-	default:
+	style, ok := commonExtensions[extension]
+	if !ok {
 		return nil
 	}
+	return commentStyles[style]
 }
 
 func getFileContents(path string) []byte {
