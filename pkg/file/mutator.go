@@ -159,6 +159,8 @@ func identifyFromExtension(extension string) *languageStyle {
 		return commentStyles["c"]
 	case ".go":
 		return commentStyles["golang"]
+	case ".mk":
+		return commentStyles["make"]
 	case ".proto":
 		return commentStyles["protobuf"]
 	case ".py":
@@ -167,6 +169,10 @@ func identifyFromExtension(extension string) *languageStyle {
 		return commentStyles["rust"]
 	case ".sh", ".patch":
 		return commentStyles["shell"]
+	case ".sql":
+		return commentStyles["sql"]
+	case ".tf":
+		return commentStyles["terraform"]
 	case ".yaml", ".yml":
 		return commentStyles["yaml"]
 	default:

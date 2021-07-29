@@ -28,14 +28,16 @@ type languageStyle struct {
 }
 
 var commentStyles = map[string]*languageStyle{
-	"bazel":    {isBlock: false, comment: "#"},
-	"c":        {isBlock: false, comment: "//"},
-	"docker":   {isBlock: false, comment: "#"},
-	"golang":   {isBlock: false, comment: "//"},
-	"make":     {isBlock: false, comment: "#"},
-	"protobuf": {isBlock: false, comment: "//"},
-	"python":   {isBlock: false, comment: "#"},
-	"rust":     {isBlock: false, comment: "//"},
-	"shell":    {isBlock: false, comment: "#"},
-	"yaml":     {isBlock: false, comment: "#"},
+	"bazel":     {isBlock: false, comment: "#"},
+	"c":         {isBlock: false, comment: "//"},
+	"docker":    {isBlock: false, comment: "#"},
+	"golang":    {isBlock: false, comment: "//"},
+	"make":      {isBlock: false, comment: "#"},
+	"protobuf":  {isBlock: false, comment: "//"},
+	"python":    {isBlock: false, comment: "#"},
+	"rust":      {isBlock: false, comment: "//"},
+	"terraform": {isBlock: false, comment: "#"},
+	"shell":     {isBlock: false, comment: "#"},
+	"sql":       {isBlock: false, comment: "--"},
+	"yaml":      {isBlock: false, comment: "#"},
 }
