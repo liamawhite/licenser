@@ -1,8 +1,13 @@
 #!/bin/bash
 
+ROOT=$(git rev-parse --show-toplevel)
+LICENSER="go run ${ROOT}/main.go"
+
 # Apply Licenses
-licenser apply -r "Liam White"
+${LICENSER} apply -r "Liam White"
 
 # Misc linters
-golangci-lint run
-find . -type f -name '*.go' | xargs gofmt -s -w
+go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2 run
+find ${ROOT} -type f -name '*.go' | xargs \
+    go run golang.org/x/tools/cmd/goimports@v0.1.5 -local github.com/liamawhite/licenser -w
+

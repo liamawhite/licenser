@@ -18,8 +18,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/liamawhite/licenser/pkg/processor"
 	"github.com/spf13/cobra"
+
+	"github.com/liamawhite/licenser/pkg/processor"
 )
 
 var verifyCmd = &cobra.Command{

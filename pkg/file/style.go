@@ -47,6 +47,7 @@ var commonExtensions = map[string]string{
 	".cpp":   "c",
 	".c++":   "c",
 	".cc":    "c",
+	".h":     "c",
 	".go":    "golang",
 	".mk":    "make",
 	".proto": "protobuf",
