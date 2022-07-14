@@ -19,9 +19,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/liamawhite/licenser/pkg/license"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/liamawhite/licenser/pkg/license"
 )
 
 func Test_shouldSkip(t *testing.T) {

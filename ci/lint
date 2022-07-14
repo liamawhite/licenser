@@ -13,7 +13,7 @@ else
     SUCCESS=false
 fi
 
-if golangci-lint run; then
+if go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2 run; then
     echo "golangci-lint succeded."
 else
     echo "golangci-lint failed."

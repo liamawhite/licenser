@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/denormal/go-gitignore"
+
 	"github.com/liamawhite/licenser/pkg/file"
 	mutator "github.com/liamawhite/licenser/pkg/file"
 	"github.com/liamawhite/licenser/pkg/license"
