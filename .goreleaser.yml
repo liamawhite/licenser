@@ -25,15 +25,10 @@ builds:
     - darwin
     - windows
   goarch:
-    - 386
+    - "386"
     - amd64
-archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
+    - arm64
+archives: []
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -47,12 +42,13 @@ changelog:
     - Merge pull request
     - Merge branch
     - goreleaser
-brew:
-  github:
-    owner: liamawhite
-    name: homebrew-licenser
-  folder: Formula
-  homepage:  https://github.com/liamawhite/licenser
-  description: Verify and append licenses to your GitHub repositories
-  test: |
-    system "#{bin}/licenser -v"
+brews:
+  - name: licenser
+    tap:
+      owner: liamawhite
+      name: homebrew-licenser
+    folder: Formula
+    homepage:  https://github.com/liamawhite/licenser
+    description: Verify and append licenses to your GitHub repositories
+    test: |
+      system "#{bin}/licenser -v"
