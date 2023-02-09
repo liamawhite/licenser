@@ -17,6 +17,10 @@ env:
 before:
   hooks:
     - go mod download
+release:
+  github:
+    owner: liamawhite
+    name: licenser
 builds:
 - env:
   - CGO_ENABLED=0
@@ -42,13 +46,3 @@ changelog:
     - Merge pull request
     - Merge branch
     - goreleaser
-brews:
-  - name: licenser
-    tap:
-      owner: liamawhite
-      name: homebrew-licenser
-    folder: Formula
-    homepage:  https://github.com/liamawhite/licenser
-    description: Verify and append licenses to your GitHub repositories
-    test: |
-      system "#{bin}/licenser -v"

@@ -32,19 +32,13 @@ Licenser will also automatically ignore the following files:
 
 ## Install
 
-To install on macOS, use Homebrew.
+Install via go install:
 
-```sh
-brew install liamawhite/licenser/licenser
+```
+go install github.com/liamawhite/licenser
 ```
 
-To install on Ubuntu/Debian, use `wget`.
-
-```sh
-wget -c https://github.com/liamawhite/licenser/releases/download/v${VERSION}/licenser_${VERSION}_Linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/bin
-```
-
-To install on other platforms, download from the [releases section](https://github.com/liamawhite/licenser/releases).
+To install from prebuilt binaries, download from the [releases section](https://github.com/liamawhite/licenser/releases).
 
 ## Verifying Licenses in your Files
 
