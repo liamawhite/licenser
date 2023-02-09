@@ -24,11 +24,11 @@ Languages:
 
 Licenser will also automatically ignore the following files:
 
-- _.md, _.golden
-- .gitignore
-- Files that should be ignored according to .gitignore (experimental)
-- .licenserignore
-- Files that should be ignored according to .licenserignore (experimental)
+- `*.md`, `*.golden`
+- `.gitignore`
+- Files that should be ignored according to `.gitignore` (experimental)
+- `.licenserignore`
+- Files that should be ignored according to `.licenserignore` (experimental)
 
 ## Install
 
