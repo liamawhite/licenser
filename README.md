@@ -14,15 +14,17 @@ Languages:
 - C/C++
 - Dockerfile
 - Golang
+- Javascript
 - Make
-- Python
 - Protobuf
+- Python
 - Shell
+- TypeScript
 - YAML
 
 Licenser will also automatically ignore the following files:
 
-- *.md, *.golden
+- _.md, _.golden
 - .gitignore
 - Files that should be ignored according to .gitignore (experimental)
 - .licenserignore
