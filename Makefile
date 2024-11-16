@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: hygiene tidy test dirty format licenser
+.PHONY: hygiene tidy test dirty format licenser build
 
 hygiene: tidy format licenser
 
@@ -30,3 +30,6 @@ test:
 
 licenser:
 	nix develop --command go run main.go apply -r "Liam White"
+
+build:
+	nix build

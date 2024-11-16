@@ -1,6 +1,6 @@
 module github.com/liamawhite/licenser
 
-go 1.18
+go 1.23.2
 
 require (
 	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
