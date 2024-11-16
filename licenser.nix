@@ -9,12 +9,7 @@ with pkgs;
 buildGoModule {
   pname = name;
   version = "v${version}";
-  src = fetchFromGitHub {
-    owner = "liamawhite";
-    repo = name;
-    rev = "v${version}";
-    sha256 = "sha256-q2JU0nBrzLNCoOPiiwFgMfwhB5Ya82ulwIOU3wGe2yI=";
-  };
+  src = ./.;
   vendorHash = "sha256-LBVVhg69VdQVsVARCkwooe6N6DacgViIW/iQWHCya4k=";
   ldFlags = "-w -s";
   CGO_ENABLED = "0";
