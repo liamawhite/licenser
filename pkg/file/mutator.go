@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -54,7 +53,7 @@ func (m *Mutator) Apply(path string, dryRun bool) bool {
 		newContents := merge(styled, contents)
 		if dryRun {
 			fmt.Printf("%s\n", newContents)
-		} else if err := ioutil.WriteFile(path, newContents, 0644); err != nil { // nolint: gosec
+		} else if err := os.WriteFile(path, newContents, 0644); err != nil { // nolint: gosec
 			_, _ = fmt.Fprintf(os.Stderr, "error writing license to %v:%v", path, err)
 		}
 	}
@@ -162,14 +161,8 @@ func identifyFromExtension(extension string) *languageStyle {
 }
 
 func getFileContents(path string) []byte {
-	// #nosec - required by the interface by design
-	f, err := os.Open(path)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "unable to open %v\n", path)
-	}
-
 	// Reading an entire file into memory will be an issue with really large files...
-	contents, err := ioutil.ReadAll(f)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "unable to read file %v\n", path)
 	}

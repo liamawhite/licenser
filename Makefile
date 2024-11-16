@@ -1,4 +1,4 @@
-# Copyright 2019 Liam White
+# Copyright 2024 Liam White
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: 2.0
-jobs:
-  lint:
-    resource_class: small
-    docker:
-      - image: cimg/go:1.18.1
-    steps:
-      - checkout
-      - run: ./ci/install
-      - run: ./ci/lint
-  test:
-    resource_class: small
-    docker:
-      - image: cimg/go:1.18.1
-    steps:
-      - checkout
-      - run: ./ci/test
+.PHONY: hygiene tidy test dirty format licenser
 
-workflows:
-  version: 2
-  all:
-    jobs:
-      - lint
-      - test
+hygiene: tidy format licenser
+
+dirty:
+	nix develop --command git diff --exit-code
+
+tidy:
+	nix develop --command go mod tidy
+
+format:
+	nix develop --command gofmt -w .
+
+test:
+	nix develop --command go test -v ./...
+
+licenser:
+	nix develop --command go run main.go apply -r "Liam White"
