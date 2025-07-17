@@ -14,12 +14,12 @@ Languages:
 - C/C++
 - Dockerfile
 - Golang
-- Javascript
+- Javascript/JSX
 - Make
 - Protobuf
 - Python
 - Shell
-- TypeScript
+- TypeScript/TSX
 - YAML
 
 Licenser will also automatically ignore the following files:
@@ -55,3 +55,4 @@ To prepend licenses to all files in a repository, run the `apply` command at the
 ```sh
 licenser apply -r "Copyright Owner"
 ```
+
