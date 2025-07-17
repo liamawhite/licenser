@@ -18,6 +18,9 @@
           default = pkgs.mkShell {
             packages = [
               pkgs.go
+              pkgs.git
+              pkgs.goreleaser
+              pkgs.golangci-lint
             ];
           };
         };

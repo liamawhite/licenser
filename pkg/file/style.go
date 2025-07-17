@@ -51,6 +51,7 @@ var commonExtensions = map[string]string{
 	".go":    "golang",
 	".h":     "c",
 	".js":    "javascript",
+	".jsx":   "javascript",
 	".mk":    "make",
 	".patch": "shell",
 	".proto": "protobuf",
@@ -60,6 +61,7 @@ var commonExtensions = map[string]string{
 	".sql":   "sql",
 	".tf":    "terraform",
 	".ts":    "javascript",
+	".tsx":   "javascript",
 	".yaml":  "yaml",
 	".yml":   "yaml",
 }

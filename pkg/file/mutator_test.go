@@ -85,6 +85,19 @@ func Test_identifyLanguageStyle(t *testing.T) {
 		{"test.yml", "yaml"},
 		{"test/test.yml", "yaml"},
 		{"test.yml/test", noLanguage},
+
+		{"test.js", "javascript"},
+		{"test/test.js", "javascript"},
+		{"test.js/test", noLanguage},
+		{"test.jsx", "javascript"},
+		{"test/test.jsx", "javascript"},
+		{"test.jsx/test", noLanguage},
+		{"test.ts", "javascript"},
+		{"test/test.ts", "javascript"},
+		{"test.ts/test", noLanguage},
+		{"test.tsx", "javascript"},
+		{"test/test.tsx", "javascript"},
+		{"test.tsx/test", noLanguage},
 	}
 	for _, tt := range tests {
 		tc := tt
