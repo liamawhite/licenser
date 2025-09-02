@@ -98,6 +98,10 @@ func Test_identifyLanguageStyle(t *testing.T) {
 		{"test.tsx", "javascript"},
 		{"test/test.tsx", "javascript"},
 		{"test.tsx/test", noLanguage},
+
+		{"test.lua", "lua"},
+		{"test/test.lua", "lua"},
+		{"test.lua/test", noLanguage},
 	}
 	for _, tt := range tests {
 		tc := tt
